@@ -270,6 +270,10 @@ location.href = location.href.replace('youzan.github.io', 'vant-ui.github.io');
                 path: 'swipe-cell',
                 title: 'SwipeCell 滑动单元格',
               },
+              {
+                path: 'drag',
+                title: 'Drag 拖拽',
+              },
             ],
           },
           {
@@ -684,6 +688,10 @@ location.href = location.href.replace('youzan.github.io', 'vant-ui.github.io');
               {
                 path: 'swipe-cell',
                 title: 'SwipeCell',
+              },
+              {
+                path: 'drag',
+                title: 'Drag',
               },
             ],
           },
