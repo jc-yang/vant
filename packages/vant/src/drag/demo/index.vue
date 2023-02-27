@@ -19,6 +19,9 @@ const boundary: DragBoundary = {
   right: 100,
   bottom: 100,
 };
+const click = () => {
+  console.log('点击了');
+};
 </script>
 
 <template>
@@ -29,14 +32,14 @@ const boundary: DragBoundary = {
   </demo-block>
 
   <demo-block :title="t('sticky')" class="block">
-    <van-drag sticky duration="0.1">
-      <van-button type="primary" :text="t('sticky')" />
+    <van-drag duration="2" sticky @click.stop="click">
+      <van-button :text="t('sticky')" type="primary" />
     </van-drag>
   </demo-block>
 
   <demo-block :title="t('restrict')">
-    <van-drag z-index="443" :boundary="boundary">
-      <van-button type="primary" :text="t('restrict')" />
+    <van-drag :boundary="boundary" sticky z-index="443">
+      <van-button :text="t('restrict')" type="primary" />
     </van-drag>
     <div class="border" />
   </demo-block>

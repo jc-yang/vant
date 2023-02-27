@@ -1,13 +1,13 @@
 import {
+  computed,
+  type CSSProperties,
   defineComponent,
+  type ExtractPropTypes,
   getCurrentInstance,
   onMounted,
-  ref,
-  reactive,
-  computed,
-  type ExtractPropTypes,
   type PropType,
-  type CSSProperties,
+  reactive,
+  ref,
 } from 'vue';
 
 import {
@@ -18,6 +18,7 @@ import {
   makeNumericProp,
   makeStringProp,
   numericProp,
+  preventDefault,
 } from '../utils';
 
 import type { DragBoundary, DragDirection } from './types';
@@ -52,7 +53,6 @@ export default defineComponent({
 
   setup(props, { slots }) {
     const $el = ref<HTMLDivElement>();
-    console.log('ccccc', $el);
     const elWidth = ref<number>(0);
     const elHeight = ref<number>(0);
     const viewportWidth = ref<number>(0);
@@ -60,6 +60,7 @@ export default defineComponent({
     const startTop = ref<number>(0);
     const startLeft = ref<number>(0);
     const position = reactive({ x: 0, y: 0 });
+    let rafId: number | undefined;
 
     const style = computed<CSSProperties>(() => {
       const { zIndex, boundary } = props;
@@ -84,15 +85,6 @@ export default defineComponent({
       elHeight.value = $el.value.offsetHeight;
       viewportWidth.value = docEle.clientWidth;
       viewportHeight.value = docEle.clientHeight;
-
-      console.log(
-        'aaaaa',
-        $el,
-        elWidth.value,
-        elHeight.value,
-        viewportWidth.value,
-        viewportHeight.value
-      );
     };
 
     onMounted(() => {
@@ -100,8 +92,10 @@ export default defineComponent({
     });
 
     const onTouchStart = (e: TouchEvent) => {
+      // preventDefault(e, true)
+      // e.preventDefault();
+      // e.stopPropagation();
       const target = e.currentTarget as HTMLElement;
-      console.log('=====', target === $el.value);
       startTop.value = target.offsetTop;
       startLeft.value = target.offsetLeft;
       position.x = e.touches[0].clientX;
@@ -109,11 +103,10 @@ export default defineComponent({
     };
 
     const onTouchMove = (e: TouchEvent) => {
-      e.preventDefault();
+      preventDefault(e, true);
       const { boundary } = props;
       const target = e.currentTarget as HTMLDivElement;
       const touch = e.targetTouches[0];
-      console.log('movvvvv', e);
       const shiftX = touch.clientX - position.x;
       const shiftY = touch.clientY - position.y;
       let newX = startLeft.value + shiftX;
@@ -141,48 +134,39 @@ export default defineComponent({
       }
     };
 
-    const goToLeft = () => {
-      const { boundary, duration } = props;
+    const smoothMove = (to: number) => {
+      const { duration } = props;
       const frames = +duration === 0 ? 1 : Math.round((+duration * 1000) / 16);
-      const currX = $el.value!.offsetLeft;
-      console.log('dddd', duration);
-      console.log('ffff', frames);
-      console.log(currX - frames);
-      if (boundary.left) {
-        if (currX > boundary.left) {
-          $el.value!.style.left = addUnit(currX - frames)!;
-          raf(goToLeft);
-        } else {
-          $el.value!.style.left = addUnit(boundary.left)!;
+      let currX = $el.value!.offsetLeft;
+      const step = (to - currX) / frames;
+      const isToLeft = step < 0;
+      console.log(rafId);
+
+      function animate() {
+        currX += step;
+        const unfinished = isToLeft ? currX >= to : currX <= to;
+        if (unfinished) {
+          $el.value!.style.left = addUnit(currX)!;
+          rafId = raf(animate);
         }
-      } else if (currX > frames) {
-        $el.value!.style.left = addUnit(currX - frames)!;
-        raf(goToLeft);
-      } else {
-        $el.value!.style.left = addUnit(0)!;
       }
+      animate();
     };
 
-    const goToRight = () => {
-      const { boundary, duration } = props;
-      const frames = +duration === 0 ? 1 : Math.round((+duration * 1000) / 16);
-      const currX = $el.value!.offsetLeft;
-      console.log('dddd', duration);
-      console.log('ffff', frames);
-      console.log(currX - frames);
-      const maxX = viewportWidth.value - elWidth.value - boundary.right;
-      if (maxX - currX > frames) {
-        $el.value!.style.left = addUnit(currX + frames)!;
-        raf(goToRight);
-      } else {
-        $el.value!.style.left = addUnit(maxX)!;
-      }
+    const moveToLeft = () => {
+      const to = props.boundary.left;
+      smoothMove(to);
     };
-    // todo: 动画duration不完善
+
+    const moveToRight = () => {
+      const to = viewportWidth.value - elWidth.value - props.boundary.right;
+      smoothMove(to);
+    };
+
     const onTouchEnd = (e: TouchEvent) => {
+      // preventDefault(e, true)
       const { boundary, direction, sticky } = props;
       const touch = e.changedTouches[0];
-      console.log('ttttt', e);
       const maxX = viewportWidth.value - elWidth.value - boundary.right;
       let curX = touch.clientX;
       if (curX > maxX) {
@@ -192,10 +176,13 @@ export default defineComponent({
       }
 
       if (direction !== 'vertical' && sticky) {
+        console.log('curx', curX, viewportWidth.value >> 1);
         if (curX < viewportWidth.value >> 1) {
-          goToLeft();
+          console.log('left');
+          moveToLeft();
         } else {
-          goToRight();
+          console.log('right');
+          moveToRight();
         }
       }
     };
