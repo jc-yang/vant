@@ -22,7 +22,8 @@ import {
 } from '../utils';
 
 import type { DragBoundary, DragDirection } from './types';
-import { raf } from '@vant/use';
+
+import { cancelRaf, raf } from '@vant/use';
 
 const [name, bem] = createNamespace('drag');
 
@@ -40,7 +41,7 @@ export const dragProps = {
     default: () => extend({}, DEFAULT_BOUNDARY_DATA),
   },
   sticky: Boolean,
-  duration: makeNumericProp(0.3),
+  speed: makeNumericProp(1000),
   zIndex: numericProp,
 };
 
@@ -95,7 +96,8 @@ export default defineComponent({
       // preventDefault(e, true)
       // e.preventDefault();
       // e.stopPropagation();
-      const target = e.currentTarget as HTMLElement;
+      if (rafId) cancelRaf(rafId);
+      const target = e.currentTarget as HTMLDivElement;
       startTop.value = target.offsetTop;
       startLeft.value = target.offsetLeft;
       position.x = e.touches[0].clientX;
@@ -135,12 +137,12 @@ export default defineComponent({
     };
 
     const smoothMove = (to: number) => {
-      const { duration } = props;
-      const frames = +duration === 0 ? 1 : Math.round((+duration * 1000) / 16);
+      const { speed } = props;
       let currX = $el.value!.offsetLeft;
-      const step = (to - currX) / frames;
-      const isToLeft = step < 0;
-      console.log(rafId);
+      const deltaPxPerFrame =
+        +speed === 0 ? Math.abs(to - currX) : Math.ceil(+speed / 60);
+      const isToLeft = currX > to;
+      const step = isToLeft ? -deltaPxPerFrame : deltaPxPerFrame;
 
       function animate() {
         currX += step;
@@ -148,6 +150,8 @@ export default defineComponent({
         if (unfinished) {
           $el.value!.style.left = addUnit(currX)!;
           rafId = raf(animate);
+        } else {
+          $el.value!.style.left = addUnit(to)!;
         }
       }
       animate();
@@ -166,22 +170,16 @@ export default defineComponent({
     const onTouchEnd = (e: TouchEvent) => {
       // preventDefault(e, true)
       const { boundary, direction, sticky } = props;
-      const touch = e.changedTouches[0];
-      const maxX = viewportWidth.value - elWidth.value - boundary.right;
-      let curX = touch.clientX;
-      if (curX > maxX) {
-        curX = maxX;
-      } else if (curX < boundary.left) {
-        curX = boundary.left;
-      }
+      const target = e.currentTarget as HTMLDivElement;
+      const eleMidX = target.offsetLeft + elWidth.value / 2;
+      const boundaryMidX =
+        boundary.left +
+        (viewportWidth.value - boundary.right - boundary.left) / 2;
 
       if (direction !== 'vertical' && sticky) {
-        console.log('curx', curX, viewportWidth.value >> 1);
-        if (curX < viewportWidth.value >> 1) {
-          console.log('left');
+        if (eleMidX < boundaryMidX) {
           moveToLeft();
         } else {
-          console.log('right');
           moveToRight();
         }
       }
