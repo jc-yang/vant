@@ -2,7 +2,7 @@
 
 ### 介绍
 
-使组件可拖拽。
+可拖拽组件。由于内部使用了 `touch-move` 等事件，建议在移动端体验完备功能。
 
 ### 引入
 
@@ -21,7 +21,23 @@ app.use(Drag);
 ### 基础用法
 
 ```html
+<van-drag>
+  <van-button text="拖拽" @click="click" />
+</van-drag>
+```
 
+```js
+import { ref } from 'vue';
+
+export default {
+  setup() {
+    const click = () => {
+      showToast('点击');
+    };
+
+    return { click };
+  },
+};
 ```
 
 ### 限制拖拽移动方向
@@ -61,11 +77,11 @@ Empty 组件内置了多种占位图片类型，可以在不同业务场景下�
 
 | 参数 | 说明 | 类型 | 默认值 |
 | --- | --- | --- | --- |
-| direction | 拖拽方向，可选值为 `vertical`、 `horizontal`、`any` | _string_ | `any` |
+| direction | 拖拽方向，可选值为 `vertical`、 `horizontal` | _string_ | `any` |
 | boundary | 限制拖拽区域 | _object_ | - |
 | sticky | 是否自动吸边 | _boolean_ | `false` |
-| speed | 吸边速度 | _number_ | `1000` |
-| zIndex | z-index | _number_ | `999` |
+| speed | 吸边速度 | _number \| string_ | `1000` |
+| zIndex | z-index | _number \| string_ | `999` |
 
 ### Slots
 

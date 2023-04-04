@@ -243,6 +243,10 @@ location.href = location.href.replace('youzan.github.io', 'vant-ui.github.io');
                 title: 'Dialog 弹出框',
               },
               {
+                path: 'drag',
+                title: 'Drag 拖拽',
+              },
+              {
                 path: 'dropdown-menu',
                 title: 'DropdownMenu 下拉菜单',
               },
@@ -269,10 +273,6 @@ location.href = location.href.replace('youzan.github.io', 'vant-ui.github.io');
               {
                 path: 'swipe-cell',
                 title: 'SwipeCell 滑动单元格',
-              },
-              {
-                path: 'drag',
-                title: 'Drag 拖拽',
               },
             ],
           },

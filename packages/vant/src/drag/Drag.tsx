@@ -93,9 +93,6 @@ export default defineComponent({
     });
 
     const onTouchStart = (e: TouchEvent) => {
-      // preventDefault(e, true)
-      // e.preventDefault();
-      // e.stopPropagation();
       if (rafId) cancelRaf(rafId);
       const target = e.currentTarget as HTMLDivElement;
       startTop.value = target.offsetTop;
