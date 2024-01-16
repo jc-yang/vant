@@ -4,7 +4,6 @@ import VanButton from '../../button';
 import { useTranslate } from '../../../docs/site';
 import { DragBoundary } from '../types';
 import { CSSProperties } from 'vue';
-import { showToast } from '../../toast';
 
 const t = useTranslate({
   'zh-CN': {
@@ -41,15 +40,20 @@ const boundaryStyle: CSSProperties = {
   right: `${boundary.right}px`,
   bottom: `${boundary.bottom}px`,
 };
-const click = () => {
-  showToast(t('click'));
+
+const clickDrag = () => {
+  console.log('点击拖拽');
+};
+
+const clickBtn = () => {
+  console.log('点击按钮');
 };
 </script>
 
 <template>
   <demo-block :title="t('basicUsage')" class="block">
-    <van-drag>
-      <van-button :text="t('drag')" @click="click" />
+    <van-drag @click="clickDrag">
+      <van-button :text="t('drag')" @click="clickBtn" />
     </van-drag>
   </demo-block>
 
@@ -57,21 +61,16 @@ const click = () => {
     <van-drag direction="horizontal">
       <van-button :text="t('horizontal')" />
     </van-drag>
-    <van-drag
-      speed="300"
-      direction="vertical"
-      :style="{ left: '150px' }"
-      sticky
-    >
+    <van-drag direction="vertical" :style="{ left: '150px' }">
       <van-button :text="t('vertical')" />
     </van-drag>
   </demo-block>
 
   <demo-block :title="t('sticky')" class="block">
-    <van-drag sticky @click.stop="click">
+    <van-drag sticky>
       <van-button :text="t('sticky')" />
     </van-drag>
-    <van-drag speed="10" sticky :style="{ left: '130px' }" @click.stop="click">
+    <van-drag sticky speed="1" :style="{ left: '130px' }">
       <van-button :text="t('speed')" />
     </van-drag>
   </demo-block>

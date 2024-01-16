@@ -2,7 +2,7 @@
 
 ### 介绍
 
-可拖拽组件。由于内部使用了 `touch-move` 等事件，建议在移动端体验完备功能。
+可拖拽组件。
 
 ### 引入
 
@@ -20,47 +20,46 @@ app.use(Drag);
 
 ### 基础用法
 
+将内容包裹在 `Drag` 组件内即可。
+
 ```html
 <van-drag>
-  <van-button text="拖拽" @click="click" />
+  <van-button text="拖拽" />
 </van-drag>
 ```
 
-```js
-import { ref } from 'vue';
+### 限制拖拽方向
 
-export default {
-  setup() {
-    const click = () => {
-      showToast('点击');
-    };
-
-    return { click };
-  },
-};
-```
-
-### 限制拖拽移动方向
-
-Empty 组件内置了多种占位图片类型，可以在不同业务场景下使用。
+设置 `direction` 属性可限制拖拽组件仅水平移动或竖直移动。
 
 ```html
 <!-- 限制拖拽水平移动 -->
+<van-drag direction="horizontal">
+  <van-button text="限制水平拖拽" />
+</van-drag>
+
 <!-- 限制拖拽竖直移动 -->
+<van-drag direction="vertical">
+  <van-button text="限制竖直拖拽" />
+</van-drag>
 ```
 
 ### 自动吸边
 
-设置 `sticky` 属性可使组件在拖拽后自动左右吸边。
+设置 `sticky` 属性可使组件在拖拽结束后自动左右吸边。
 
 ```html
-
+<van-drag sticky>
+  <van-button text="自动吸边" />
+</van-drag>
 ```
 
-设置 `speed` 属性可调整拖拽释放后吸边的移动速度，默认为 `100px/s (60Hz屏幕)`
+同时，设置 `speed` 属性可调整拖拽释放后吸边的移动速度，默认为 `1000px/s (60Hz屏幕)`
 
 ```html
-
+<van-drag sticky speed="10">
+  <van-button text="设置吸边速度" />
+</van-drag>
 ```
 
 ### 限制拖拽区域
@@ -68,7 +67,30 @@ Empty 组件内置了多种占位图片类型，可以在不同业务场景下�
 设置 `boundary` 属性可限制拖拽区域。
 
 ```html
+<van-drag :boundary="boundary" sticky>
+  <van-button text="限制拖拽区域" />
+</van-drag>
+<div
+  :style="{ position: 'fixed', border: '1px solid red', ...boundaryStyle }"
+/>
+```
 
+```js
+import type { DragBoundary } from 'vant';
+import type { CSSProperties } from 'vue';
+const boundary: DragBoundary = {
+  top: 430,
+  left: 10,
+  right: 100,
+  bottom: 100,
+};
+
+const boundaryStyle: CSSProperties = {
+  top: `${boundary.top}px`,
+  left: `${boundary.left}px`,
+  right: `${boundary.right}px`,
+  bottom: `${boundary.bottom}px`,
+};
 ```
 
 ## API
@@ -80,8 +102,8 @@ Empty 组件内置了多种占位图片类型，可以在不同业务场景下�
 | direction | 拖拽方向，可选值为 `vertical`、 `horizontal` | _string_ | `any` |
 | boundary | 限制拖拽区域 | _object_ | - |
 | sticky | 是否自动吸边 | _boolean_ | `false` |
-| speed | 吸边速度 | _number \| string_ | `1000` |
-| zIndex | z-index | _number \| string_ | `999` |
+| speed | 吸边速度，仅在 `sticky` 为 `true` 时有效，单位 px/s (以 60Hz 屏幕为基准)。值为 0 时无动画效果。 | _number \| string_ | `1000` |
+| z-index | 设置拖拽组件的 z-index | _number \| string_ | `999` |
 
 ### Slots
 
@@ -94,22 +116,5 @@ Empty 组件内置了多种占位图片类型，可以在不同业务场景下�
 组件导出以下类型定义：
 
 ```ts
-import type { EmptyProps } from 'vant';
+import type { DragProps, DragBoundary, DragDirection } from 'vant';
 ```
-
-## 主题定制
-
-### 样式变量
-
-组件提供了下列 CSS 变量，可用于自定义样式，使用方法请参考 [ConfigProvider 组件](#/zh-CN/config-provider)。
-
-| 名称                                | 默认值                      | 描述 |
-| ----------------------------------- | --------------------------- | ---- |
-| --van-empty-padding                 | _var(--van-padding-xl) 0_   | -    |
-| --van-empty-image-size              | _160px_                     | -    |
-| --van-empty-description-margin-top  | _var(--van-padding-md)_     | -    |
-| --van-empty-description-padding     | _0 60px_                    | -    |
-| --van-empty-description-color       | _var(--van-text-color-2)_   | -    |
-| --van-empty-description-font-size   | _var(--van-font-size-md)_   | -    |
-| --van-empty-description-line-height | _var(--van-line-height-md)_ | -    |
-| --van-empty-bottom-margin-top       | _24px_                      | -    |

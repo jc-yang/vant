@@ -662,6 +662,10 @@ location.href = location.href.replace('youzan.github.io', 'vant-ui.github.io');
                 title: 'Dialog',
               },
               {
+                path: 'drag',
+                title: 'Drag',
+              },
+              {
                 path: 'dropdown-menu',
                 title: 'DropdownMenu',
               },
@@ -688,10 +692,6 @@ location.href = location.href.replace('youzan.github.io', 'vant-ui.github.io');
               {
                 path: 'swipe-cell',
                 title: 'SwipeCell',
-              },
-              {
-                path: 'drag',
-                title: 'Drag',
               },
             ],
           },
